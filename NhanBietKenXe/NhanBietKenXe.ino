@@ -1,4 +1,3 @@
-
 #include "SIM900.h"
 #include <SoftwareSerial.h>
 #include "sms.h"
@@ -6,22 +5,21 @@
 /////////////// GLOBAL VARIABLE ///////////////
 #define MAX_SOUND_TRACK 100
 #define SOUND_PIN_TOTAL 2
-#define DELAY_TIME 10 // milisecond
+#define DELAY_TIME 5 // milisecond
 #define UNSET_VALUE -1
 
 #define TRACKING_STATUS_NOT_TRACKING 0
 #define TRACKING_STATUS_NEED_START_TRACKING 1
 #define TRACKING_STATUS_TRACKING 2
-#define HONK_MIN 200
+#define HONK_MIN 100
 
 int soundPins[SOUND_PIN_TOTAL] = {A0, A1};
 int soundValues[SOUND_PIN_TOTAL][MAX_SOUND_TRACK];
-bool allowTrack = false;
 
 void reset_sound_value() {
   for (int p = 0; p < SOUND_PIN_TOTAL; p++) {
-    for (int s = 0; s < MAX_SOUND_TRACK; s++) {
-      soundValues[p][s] = UNSET_VALUE;
+    for (int t = 0; t < MAX_SOUND_TRACK; t++) {
+      soundValues[p][t] = UNSET_VALUE;
     }
   }
 }
@@ -37,13 +35,37 @@ int *read_sound_array() {
 }
 
 
+int null_soundtrack_index() {
+  for (int t = 0; t < MAX_SOUND_TRACK; t++) {
+    if (soundValues[0][t] < 0) return t;
+  }
+
+  return -1;
+}
+
+void set_newSoundTrack(int trackIndex, int *newValues) {
+  // Serial.println("");
+  // Serial.print("trackIndex: ");
+  // Serial.print(trackIndex);
+  // Serial.println("");
+  // Serial.print("newSoundTrack: ");
+  for (int p = 0; p < SOUND_PIN_TOTAL; p++) {
+    int value = *(newValues + p);
+    soundValues[p][trackIndex] = value;
+
+    // Serial.print(value);
+    // Serial.print(" ");
+  }
+}
+
 int tracking_status(int *newValues) {
   bool isNotTracking = soundValues[0][0] == UNSET_VALUE;
-  if (isNotTracking) return TRACKING_STATUS_TRACKING;
+  if (!isNotTracking) return TRACKING_STATUS_TRACKING;
 
   int hasHonkValue = false;
   for (int p = 0; p < SOUND_PIN_TOTAL; p++) {
     int value = *(newValues + p);
+    // print_sound_bar(p, value);
     if (value >= HONK_MIN) {
       hasHonkValue = true;
       break;
@@ -55,7 +77,7 @@ int tracking_status(int *newValues) {
 }
 
 bool need_start_analyse() {
-  return soundValues[0][SOUND_PIN_TOTAL - 1] != UNSET_VALUE;
+  return soundValues[0][MAX_SOUND_TRACK - 1] >= 0;
 }
 
 int read_sound(int si) {
@@ -65,25 +87,41 @@ int read_sound(int si) {
 
 void print_sound_bar(int si, int value) {
   int bar = int(value / 10);
+  Serial.println("");
   Serial.print("A");
   Serial.print(si);
   Serial.print(":");
-  for (int bi = 0; bi < value; bi++) {
-    Serial.print("=");
+  for (int bi = 0; bi < bar; bi++) {
+    Serial.print("x");
   }
-  Serial.println("");
+  Serial.print(value);
 }
 
 void do_analyse() {
+  Serial.println("");
+  Serial.print("DO ANALYSE ============  ");
   
+  int max = -1;
+  int soundMax = -1;
+  for (int p = 0; p < SOUND_PIN_TOTAL; p++) {
+    for (int t = 0; t < MAX_SOUND_TRACK; t++) {
+      int value = soundValues[p][t];
+      if (value > max) {
+        max = value;
+        soundMax = p;
+      }
+    }
+  }
+
+  Serial.print(soundMax);
+  Serial.println("");
 }
 
 ///////////////////////////////////////////////
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
-
+  reset_sound_value();
 }
 
 void loop() {
@@ -91,16 +129,21 @@ void loop() {
     do_analyse();
     reset_sound_value();
   }
-  
+
   int *sounds = read_sound_array();
   int status = tracking_status(sounds);
 
-  switch(status) {
-  case TRACKING_STATUS_NOT_TRACKING: break;
-  case TRACKING_STATUS_NEED_START_TRACKING: break;
-  case TRACKING_STATUS_TRACKING: break;
-  default: break;
+  // Serial.println("");
+  // Serial.print("STATUS  ");
+  // Serial.print(status);
+  // Serial.println("");
+  if (status == TRACKING_STATUS_TRACKING || status == TRACKING_STATUS_NEED_START_TRACKING) {
+    int nullIndex = null_soundtrack_index();
+    // Serial.println("nullIndex = ");
+    // Serial.print(nullIndex);
+    set_newSoundTrack(nullIndex, sounds);
   }
-  
+
+
   delay(DELAY_TIME);
 }
