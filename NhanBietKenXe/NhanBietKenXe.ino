@@ -1,11 +1,12 @@
 #include "SIM900.h"
 #include <SoftwareSerial.h>
 #include "sms.h"
+#include <stdio.h>
 
 /////////////// GLOBAL VARIABLE ///////////////
 #define MAX_SOUND_TRACK 100
 #define SOUND_PIN_TOTAL 2
-#define DELAY_TIME 5 // milisecond
+#define DELAY_TIME 10 // milisecond
 #define UNSET_VALUE -1
 
 #define TRACKING_STATUS_NOT_TRACKING 0
@@ -15,6 +16,8 @@
 
 int soundPins[SOUND_PIN_TOTAL] = {A0, A1};
 int soundValues[SOUND_PIN_TOTAL][MAX_SOUND_TRACK];
+SMSGSM sms;
+boolean started = false; //trạng thái modul sim
 
 void reset_sound_value() {
   for (int p = 0; p < SOUND_PIN_TOTAL; p++) {
@@ -97,13 +100,26 @@ void print_sound_bar(int si, int value) {
   Serial.print(value);
 }
 
+void print_all() {
+  for (int p = 0; p < SOUND_PIN_TOTAL; p++) {
+    Serial.println("");
+    Serial.print("A");
+    Serial.print(p);
+    Serial.print(":");
+    for (int t = 0; t < MAX_SOUND_TRACK; t++) {
+      Serial.print(soundValues[p][t]);
+      Serial.print(",");
+    }
+  }
+}
+
 void do_analyse() {
   Serial.println("");
   Serial.print("DO ANALYSE ============  ");
-  
+  print_all();
   int max = -1;
   int soundMax = -1;
-  for (int p = 0; p < SOUND_PIN_TOTAL; p++) {
+  for (int p = 0; p < 2; p++) {
     for (int t = 0; t < MAX_SOUND_TRACK; t++) {
       int value = soundValues[p][t];
       if (value > max) {
@@ -112,9 +128,20 @@ void do_analyse() {
       }
     }
   }
-
+  Serial.println("");
+  Serial.print("SOUND AT ");
   Serial.print(soundMax);
   Serial.println("");
+  sendSMS(soundMax);
+}
+
+void sendSMS(int soundIndex) {
+  if (started) {
+    char sdt[] = "+84377670064";
+    char msg[20];
+    sprintf(msg, "From %d", soundIndex);
+    //sms.SendSMS(sdt, msg);
+  }
 }
 
 ///////////////////////////////////////////////
@@ -122,6 +149,11 @@ void do_analyse() {
 void setup() {
   Serial.begin(9600);
   reset_sound_value();
+
+  if (gsm.begin(2400)) {
+    Serial.println("\nstatus=READY");
+    started = true;
+  } else Serial.println("\nstatus=IDLE");
 }
 
 void loop() {

@@ -23,8 +23,7 @@ void setup() {
   if (gsm.begin(2400)) {
     Serial.println("\nstatus=READY");
     started = true;
-  } else
-    Serial.println("\nstatus=IDLE");
+  } else Serial.println("\nstatus=IDLE");
 
   if (started) {
     char sdt[] = "+84903540608";
