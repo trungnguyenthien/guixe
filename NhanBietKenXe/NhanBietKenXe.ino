@@ -191,5 +191,10 @@ void loop() {
     set_newSoundTrack(unset_index, sounds);
   }
 
+//  int valueD7 = digitalRead(7);
+//  if(valueD7 == HIGH) {
+//    Serial.println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//  }
+
   delay(DELAY_TIME);
 }
