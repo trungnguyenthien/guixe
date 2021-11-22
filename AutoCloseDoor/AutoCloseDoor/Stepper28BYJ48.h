@@ -16,7 +16,6 @@ class Stepper28BYJ48
 private:
     const int maxSpeed = 15;
     const int stepsPerRevolution = 2048;
-    byte dIn1, dIn2, dIn3, dIn4, ratio;
     Stepper myStepper = Stepper(0, 0, 0, 0, 0);
 
 public:
@@ -26,11 +25,6 @@ public:
         int dIn3,
         int dIn4)
     {
-        this->dIn1 = dIn1;
-        this->dIn2 = dIn2;
-        this->dIn3 = dIn3;
-        this->dIn4 = dIn4;
-
         myStepper = Stepper(stepsPerRevolution, dIn1, dIn3, dIn2, dIn4);
     }
 
