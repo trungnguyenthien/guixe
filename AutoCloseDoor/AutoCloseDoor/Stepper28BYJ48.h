@@ -36,7 +36,8 @@ public:
 
     void run(float speed, float round)
     {
-        if(speed > 1) {
+        if (speed > 1)
+        {
             speed = 1;
         }
         myStepper.setSpeed(speed * maxSpeed);
