@@ -9,6 +9,11 @@
  * 
  */
 
+/** 
+ * SUPPORT: 
+ * - ULN2003 Driver + 28BYJ-48 stepper
+ */
+
 #include <Stepper.h>
 
 class Stepper28BYJ48
@@ -38,3 +43,18 @@ public:
         myStepper.step(stepsPerRevolution * round);
     }
 };
+
+/** SAMPLE
+ * Stepper28BYJ48 st(8, 9, 10, 11);
+ * // Các chân ứng với IN1, IN2, IN3, IN4
+ * 
+ * Method: run(float speed, float round)
+ * speed = 0..1 (1 là tốc độ max, 0.5 là 50% tốc độ)
+ * round = là số kiểu float:
+ *  0 là không xoay
+ *  0.1 xoay 10% vòng tròn
+ *  0.11 xoay 11% vòng tròn
+ * -0.11 là xoay 11% vòng tròn (ngược chiều kim đồng hồ)
+ *  1 xoay đúng 1 vòng tròn
+ *  2 xoay đúng 2 vòng tròn
+ * -2 xoay đúng 2 vòng tròn (ngược chiều kim đồng hồ)
