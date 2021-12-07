@@ -2,6 +2,8 @@
 
 * sim900.zip
 
+http://arduino.vn/bai-viet/854-sim900a-arduino-gui-va-nhan-sms
+
 ### Nối chân
 
 <img src="https://tva1.sinaimg.cn/large/008i3skNgy1gvy5jm73udj30o00o4acz.jpg" alt="image-20211031064334798" style="zoom:50%;" />
