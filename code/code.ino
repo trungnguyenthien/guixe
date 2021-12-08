@@ -10,7 +10,7 @@ DFRobotDFPlayerMini myDFPlayer;
 #define ENABLE_GAS false
 #define ENABLE_IR true
 
-char sdt[] = "+84377670064";
+char sdt[20] = "+84377670064";
 char SMS1[50] = "Canh bao Palette 1 co tieng coi";
 char SMS2[50] = "Canh bao Palette 1 co khoi";
 char SMS3[50] = "Canh bao Palette 1 co chuyen dong";
@@ -89,17 +89,9 @@ void setup()
 
 void mp3(int x)
 {
-  if(x == 13) return; //
   // mySoftwareSerial.listen();
   myDFPlayer.play(x);
-  if (x == 13)
-  {
-    delay(7000);
-  }
-  else
-  {
-    delay(4000);
-  }
+  delay(4000);
 }
 
 void pump()
@@ -134,7 +126,6 @@ void loop()
   {
     Serial.println(SMS3);
     mp3(9);
-    mp3(13);
     SendMessage(SMS3);
     pause_after_speak();
     return;
@@ -161,7 +152,6 @@ void loop()
   {
     Serial.println(SMS6);
     mp3(10);
-    mp3(13);
     SendMessage(SMS6);
     pause_after_speak();
     return;
@@ -188,7 +178,6 @@ void loop()
   {
     Serial.println(SMS9);
     mp3(11);
-    mp3(13);
     SendMessage(SMS9);
     pause_after_speak();
     return;
@@ -215,7 +204,6 @@ void loop()
   {
     Serial.println(SMS12);
     mp3(12);
-    mp3(13);
     SendMessage(SMS12);
     pause_after_speak();
     return;
@@ -223,13 +211,13 @@ void loop()
 
   delay(2);
 }
-void SendMessage(char SMS[50])
+void SendMessage(char *SMS)
 {
   if (started)
   {
-    Serial.println("SEND SMS");
-    char sdt[] = "+84903540608";
-    char msg[] = "noi dung tin nhan";
-    sms.SendSMS(sdt, msg);
+    Serial.println("SEND SMS ");
+    Serial.println(*SMS);
+    sms.SendSMS(*sdt, *SMS);
+    delay(2000);
   }
 }
