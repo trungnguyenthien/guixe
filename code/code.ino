@@ -7,8 +7,9 @@ SoftwareSerial mySoftwareSerial(11, 10);
 DFRobotDFPlayerMini myDFPlayer;
 #define DELAY_TIME 1000
 #define ENABLE_SOUND false
-#define ENABLE_GAS false
-#define ENABLE_IR true
+#define ENABLE_GAS true
+#define ENABLE_IR false
+#define ENABLE_SMS false
 
 char sdt[20] = "+84377670064";
 char SMS1[50] = "Canh bao Palette 1 co tieng coi";
@@ -58,19 +59,14 @@ void setup()
   pinMode(13, INPUT); // gas
 
   pinMode(3, OUTPUT);
-  pinMode(0, OUTPUT);
+  pinMode(8, OUTPUT);
+  
   digitalWrite(3, LOW);
-  digitalWrite(0, HIGH);
+  digitalWrite(8, HIGH);
+  
   delay(7000);
 
-  // put your setup code here, to run once:
-  if (gsm.begin(2400))
-  {
-    Serial.println("\nstatus=READY");
-    started = true;
-  }
-  else
-    Serial.println("\nstatus=IDLE");
+  initSMS();
 
   mySoftwareSerial.begin(9600);
 
@@ -96,9 +92,9 @@ void mp3(int x)
 
 void pump()
 {
-  digitalWrite(0, LOW);
+  digitalWrite(8, LOW);
   delay(5000);
-  digitalWrite(0, HIGH);
+  digitalWrite(8, HIGH);
 }
 
 void loop()
@@ -113,7 +109,7 @@ void loop()
     pause_after_speak();
     return;
   }
-  else if (!digitalRead(4) && ENABLE_GAS)
+  else if (digitalRead(4) == LOW && ENABLE_GAS)
   {
     Serial.println(SMS2);
     mp3(5);
@@ -139,7 +135,7 @@ void loop()
     pause_after_speak();
     return;
   }
-  else if (!digitalRead(15) && ENABLE_GAS)
+  else if (digitalRead(15) == LOW && ENABLE_GAS)
   {
     Serial.println(SMS5);
     mp3(6);
@@ -165,7 +161,7 @@ void loop()
     pause_after_speak();
     return;
   }
-  else if (!digitalRead(17) && ENABLE_GAS)
+  else if (digitalRead(17) == LOW && ENABLE_GAS)
   {
     Serial.println(SMS8);
     mp3(7);
@@ -191,7 +187,7 @@ void loop()
     pause_after_speak();
     return;
   }
-  else if (!digitalRead(13) && ENABLE_GAS)
+  else if (digitalRead(13) == HIGH && ENABLE_GAS)
   {
     Serial.println(SMS11);
     mp3(8);
@@ -213,11 +209,32 @@ void loop()
 }
 void SendMessage(char *SMS)
 {
+  if (!ENABLE_SMS)
+  {
+    return;
+  }
   if (started)
   {
     Serial.println("SEND SMS ");
-    Serial.println(*SMS);
-    sms.SendSMS(*sdt, *SMS);
+    sms.SendSMS(sdt, SMS);
+    Serial.println("Send Completed");
     delay(2000);
   }
+}
+
+
+void initSMS()
+{
+  if (!ENABLE_SMS)
+  {
+    return;
+  }
+  // put your setup code here, to run once:
+  if (gsm.begin(2400))
+  {
+    Serial.println("\nstatus=READY");
+    started = true;
+  }
+  else
+    Serial.println("\nstatus=IDLE");
 }
