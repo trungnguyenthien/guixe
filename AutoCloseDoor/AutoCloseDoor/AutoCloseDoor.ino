@@ -19,7 +19,7 @@ void loop()
   ss.check();
   int distance = ss.distanceByCm();
   if (distance < 4) {
-    st.run(0.5, 2);
+    st.run(0.5, 0.5);
   }
   delay(200);
 }
