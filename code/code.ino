@@ -6,9 +6,9 @@
 SoftwareSerial mySoftwareSerial(11, 10);
 DFRobotDFPlayerMini myDFPlayer;
 #define DELAY_TIME 1000
-#define ENABLE_SOUND false
+#define ENABLE_SOUND true
 #define ENABLE_GAS false
-#define ENABLE_IR true
+#define ENABLE_IR false
 #define ENABLE_SMS false
 
 char sdt[20] = "+84377670064";
